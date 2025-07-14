@@ -13,7 +13,7 @@ public class SerializerFactory {
     /**
      * 默认序列化器
      */
-    private static final Serializer DEFAULT_SERIALIZER = getInstance(SerializerKeys.JDK);
+    private static final Serializer DEFAULT_SERIALIZER = new JdkSerializer();
 
     /**
      * 获取实例

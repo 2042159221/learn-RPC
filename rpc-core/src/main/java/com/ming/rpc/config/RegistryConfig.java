@@ -1,5 +1,6 @@
 package com.ming.rpc.config;
 
+import com.ming.rpc.registry.RegistryKeys;
 import lombok.Data;
 
 /**
