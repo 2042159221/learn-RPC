@@ -1,0 +1,2 @@
+no=com.ming.rpc.fault.retry.NoRetryStrategy
+fixedInterval=com.ming.rpc.fault.retry.FixedIntervalRetryStrategy

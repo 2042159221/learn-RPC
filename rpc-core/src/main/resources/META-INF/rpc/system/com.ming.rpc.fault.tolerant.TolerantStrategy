@@ -1,0 +1,4 @@
+failBack=com.ming.rpc.fault.tolerant.FailBackTolerantStrategy
+failFast=com.ming.rpc.fault.tolerant.FailFastTolerantStrategy
+failOver=com.ming.rpc.fault.tolerant.FailOverTolerantStrategy
+failSafe=com.ming.rpc.fault.tolerant.FailSafeTolerantStrategy

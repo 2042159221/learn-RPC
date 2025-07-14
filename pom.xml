@@ -11,6 +11,7 @@
 
     <modules>
         <module>rpc-easy</module>
+        <module>rpc-core</module>
         <module>example-common</module>
         <module>example-provider</module>
         <module>example-consumer</module>

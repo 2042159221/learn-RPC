@@ -1,0 +1,3 @@
+roundRobin=com.yupi.rpc.loadbalancer.RoundRobinLoadBalancer
+random=com.ming.rpc.loadbalancer.RandomLoadBalancer
+consistentHash=com.ming.rpc.loadbalancer.ConsistentHashLoadBalancer

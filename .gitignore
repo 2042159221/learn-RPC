@@ -69,3 +69,10 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+
+# cursor
+.cursor/
+
+
+### 屏蔽文档 ###
+agent-doc/

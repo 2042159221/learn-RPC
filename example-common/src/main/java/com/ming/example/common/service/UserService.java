@@ -13,4 +13,12 @@ public interface UserService {
      * @return 用户
      */
     User getUser(User user);
+
+    /**
+     * 用于测试 mock 接口返回值
+     * @return 
+     */
+    default short getNumber() {
+        return 1;
+    }
 }

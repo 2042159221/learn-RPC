@@ -1,0 +1,4 @@
+jdk=com.ming.rpc.serializer.JdkSerializer
+hessian=com.ming.rpc.serializer.HessianSerializer
+json=com.ming.rpc.serializer.JsonSerializer
+kryo=com.ming.rpc.serializer.KryoSerializer
