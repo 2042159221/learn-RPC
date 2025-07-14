@@ -1,6 +1,6 @@
 package com.ming.rpc.serializer;
 
-import com.ming.rpc.model.RpcRequest;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -68,7 +68,7 @@ public class SerializerTest {
      */
     @Test
     public void testSerializerFactory() {
-        Serializer serializer = SerializerFactory.getInstance("jdk");
+        Serializer serializer = SerializerFactory.getInstance(SerializerKeys.JDK);
         Assert.assertNotNull(serializer);
         Assert.assertTrue(serializer instanceof JdkSerializer);
 

@@ -1,12 +1,11 @@
 package com.ming.rpc.serializer;
 
-
 /**
- * 序列化器键名常量
+ * 序列化器键名
  */
-public interface SerializerKeys {
-    String JDK = "jdk";//JDK序列化
-    String JSON = "json";//JSON序列化
-    String KRYO = "kryo";//KRYO序列化
-    String HESSIAN = "hessian";//HESSIAN序列化
+public class SerializerKeys {
+    public static final String JDK = "jdk";
+    public static final String JSON = "json";
+    public static final String KRYO = "kryo";
+    public static final String HESSIAN = "hessian";
 }

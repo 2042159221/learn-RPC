@@ -1,16 +1,13 @@
 package com.ming.example.consumer.client.proxy;
-
-import com.ming.rpc.protocol.serialize.Serializer;
-
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 
 import com.ming.example.common.modle.User;
 import com.ming.example.common.service.UserService;
-import com.ming.rpc.model.request.RpcRequest;
-import com.ming.rpc.model.response.RpcResponse;
-import com.ming.rpc.protocol.serialize.JdkSerializer;
-
+import com.ming.rpc.serializer.JdkSerializer;
+import com.ming.rpc.serializer.Serializer;
+import com.ming.rpc.model.RpcRequest;
+import com.ming.rpc.model.RpcResponse;
 /**
  * static proxy                                     
  */
