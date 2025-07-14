@@ -35,13 +35,13 @@ public class SpiLoader {
      * 系统SPI 目录
      * 
      */
-    private static final String RPC_SYSTEM_SPI_DIR = "META-INF/rpc/system";
+    private static final String RPC_SYSTEM_SPI_DIR = "META-INF/rpc/system/";
 
     /**
      * 用户自定义SPI 目录
      * 
      */
-    private static final String RPC_CUSTOM_SPI_DIR = "META-INF/rpc/custom";
+    private static final String RPC_CUSTOM_SPI_DIR = "META-INF/rpc/custom/";
 
     /**
      * 扫描路径
@@ -110,10 +110,14 @@ public class SpiLoader {
         Map<String,Class<?>> keyClassMap = new HashMap<>();
         for(String scanDir : SCAN_DIRS) {
             //构建扫描路径，获取到所有资源
-            List<URL> resources = ResourceUtil.getResources(scanDir + loadClass.getName());
+            String path = scanDir + loadClass.getName();
+            log.info("扫描路径：{}", path);
+            List<URL> resources = ResourceUtil.getResources(path);
+            log.info("找到的资源：{}", resources);
             //读取每个资源文件
             for(URL resource : resources) {
                 try {
+                    log.info("处理资源：{}", resource);
                     /** 打开文件输入流，支持自动关闭（try-with-resources），防止内存泄漏。
                      * InputStreamReader 将二进制流变成字符流；
                      * BufferedReader 用来逐行读取。
@@ -122,19 +126,33 @@ public class SpiLoader {
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                     String line;
                     while((line = bufferedReader.readLine()) != null) {
+                        log.info("读取行：{}", line);
+                        if (line.trim().isEmpty() || line.startsWith("#")) {
+                            continue; // 跳过空行和注释行
+                        }
                         String[] strArray = line.split("=");
                         if(strArray.length > 1) {
                             String key = strArray[0];
                             String value = strArray[1];
-                            //利用 Class.forName(value) 反射加载类对象，并注册进当前接口类的 key -> class 映射表中
-                            keyClassMap.put(key, Class.forName(value));
+                            log.info("解析键值对：{} = {}", key, value);
+                            try {
+                                //利用 Class.forName(value) 反射加载类对象，并注册进当前接口类的 key -> class 映射表中
+                                Class<?> clazz = Class.forName(value);
+                                log.info("加载类成功：{}", clazz);
+                                keyClassMap.put(key, clazz);
+                            } catch (ClassNotFoundException e) {
+                                log.error("加载类失败：{}", e.getMessage());
+                            }
+                        } else {
+                            log.warn("行格式不正确，无法解析键值对：{}", line);
                         }
                     }
                 } catch (Exception e) {
-                    log.error("加载{}的SPI实现类失败",loadClass.getName(),e);
+                    log.error("加载{}的SPI实现类失败", loadClass.getName(), e);
                 }
             }
-        }            
+        }
+        log.info("最终加载的键值映射：{}", keyClassMap);
         loaderMap.put(loadClass.getName(), keyClassMap);
         return keyClassMap;
     }

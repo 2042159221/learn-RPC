@@ -5,11 +5,13 @@ import com.ming.rpc.constant.RpcConstant;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 服务元信息(注册信息)
  */
 @Data
-public class ServiceMetaInfo {
+public class ServiceMetaInfo implements Serializable {
     /**
      * 服务名称
      */
