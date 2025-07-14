@@ -2,19 +2,15 @@ package com.ming.rpc.loadbalancer;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Random;
 
 import com.ming.rpc.model.ServiceMetaInfo;
 
 /**
- * 轮询负载均衡器
+ * 随机负载均衡器
  */
-public class RoundRobinLoadBalancer implements LoadBalancer {
-    /**
-     * 当前轮询的下标
-     */
-    private final AtomicInteger currentIndex = new AtomicInteger(0);
-
+public class RandomLoadBalancer implements LoadBalancer {
+    private final Random random = new Random();
     /**
      * 选择服务实例
      * @param requestParams 请求参数
@@ -24,15 +20,14 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
     @Override
     public ServiceMetaInfo select(Map<String , Object> requestParams,List<ServiceMetaInfo> serviceMetaInfoList) {
         if(serviceMetaInfoList == null || serviceMetaInfoList.isEmpty()) {
-        return null;
+            return null;
         }
-        //只有一个服务，无需轮询
+        //只有一个服务，不用随机
         int size = serviceMetaInfoList.size();
         if(size == 1) {
             return serviceMetaInfoList.get(0);
         }
-        // 取模算法轮询，防止下标越界
-        int index = currentIndex.getAndIncrement() % size;
-        return serviceMetaInfoList.get(index);
+        return serviceMetaInfoList.get(random.nextInt(size));
     }
+
 }

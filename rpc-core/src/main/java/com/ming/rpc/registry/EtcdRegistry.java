@@ -223,7 +223,10 @@ public class EtcdRegistry implements Registry {
         if(client != null){
             client.close();
         }
-        //停止定时任务
+        // 停止心跳检测的定时任务
+        // 在EtcdRegistry被销毁时，它所启动的心跳续约定时任务也应该被停止，
+        // 以释放资源并防止在测试或应用重启等场景下出现任务重复启动的异常。
+        CronUtil.stop();
     }
 
    

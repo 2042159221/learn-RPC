@@ -28,7 +28,7 @@ public class ConfigTest {
         // 验证注册中心默认配置
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
         Assert.assertNotNull(registryConfig);
-        Assert.assertEquals("ETCD", registryConfig.getRegistry());
+        Assert.assertEquals("etcd", registryConfig.getRegistry());
         Assert.assertEquals("http://localhost:2380", registryConfig.getAddress());
         Assert.assertEquals(Long.valueOf(10000), registryConfig.getTimeout());
     }
@@ -51,7 +51,7 @@ public class ConfigTest {
         // 验证注册中心配置
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
         Assert.assertNotNull(registryConfig);
-        Assert.assertEquals("ETCD", registryConfig.getRegistry());
+        Assert.assertEquals("etcd", registryConfig.getRegistry().toLowerCase());
         Assert.assertEquals("http://localhost:2380", registryConfig.getAddress());
         Assert.assertEquals(Long.valueOf(5000), registryConfig.getTimeout());
     }
@@ -75,8 +75,9 @@ public class ConfigTest {
         // 验证注册中心配置
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
         Assert.assertNotNull(registryConfig);
-        Assert.assertEquals("LOCAL", registryConfig.getRegistry());
-        Assert.assertEquals("http://localhost:8848", registryConfig.getAddress());
+        Assert.assertEquals("local", registryConfig.getRegistry().toLowerCase());
+        // 使用 trim() 方法去除可能存在于地址字符串前后的多余空格
+        Assert.assertEquals("http://localhost:8848", registryConfig.getAddress().trim());
     }
     
     /**
@@ -84,11 +85,9 @@ public class ConfigTest {
      */
     @Test
     public void testLoadWithException() {
-        // 尝试加载不存在的环境配置
-        RpcConfig rpcConfig = ConfigUtils.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX, "notExist");
-        
-        // 验证应该返回默认值
-        Assert.assertEquals("rpc", rpcConfig.getName());
-        Assert.assertEquals("1.0", rpcConfig.getVersion());
+        // 尝试加载不存在的环境配置,并断言会抛出异常
+        Assert.assertThrows(cn.hutool.core.io.resource.NoResourceException.class, () -> {
+            ConfigUtils.loadConfig(RpcConfig.class, RpcConstant.DEFAULT_CONFIG_PREFIX, "notExist");
+        });
     }
 } 

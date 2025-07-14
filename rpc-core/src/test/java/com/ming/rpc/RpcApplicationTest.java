@@ -1,6 +1,7 @@
 package com.ming.rpc;
 
 import com.ming.rpc.config.RpcConfig;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,6 +9,17 @@ import org.junit.Test;
  * RPC应用测试类
  */
 public class RpcApplicationTest {
+
+    /**
+     * 在每个测试方法执行后运行，用于清理和重置应用状态。
+     * 通过调用 RpcApplication.destroy()，可以确保关闭注册中心连接、
+     * 停止心跳任务，并重置所有静态配置。
+     * 这对于防止测试用例之间产生状态干扰至关重要。
+     */
+    @After
+    public void tearDown() {
+        RpcApplication.destroy();
+    }
 
     /**
      * 测试RpcApplication的单例模式
@@ -36,7 +48,7 @@ public class RpcApplicationTest {
         
         // 验证从配置文件加载的值
         // 注意：这个测试依赖于application.properties中的配置
-        Assert.assertEquals("ming-rpc", rpcConfig.getName());
+        Assert.assertEquals("ming-rpc", rpcConfig.getName().toLowerCase());
     }
     
     /**

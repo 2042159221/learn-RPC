@@ -18,6 +18,13 @@ public class RpcApplication {
     private static volatile RpcConfig rpcConfig;
 
     /**
+     * 用于在应用级别持有注册中心实例的静态字段。
+     * 这样设计使得在应用的生命周期内可以方便地访问和管理注册中心实例，
+     * 特别是在需要手动销毁或重置状态的测试场景中。
+     */
+    private static Registry registry;
+
+    /**
      * 框架初始化，支持传入自定义配置
      *
      * @param newRpcConfig
@@ -27,7 +34,11 @@ public class RpcApplication {
         log.info("rpc init, config = {}", newRpcConfig.toString());
         // 注册中心初始化
         RegistryConfig registryConfig = rpcConfig.getRegistryConfig();
-        Registry registry = RegistryFactory.getInstance(registryConfig.getRegistry());
+        // SPI机制默认是根据key（例如 "etcd"）来查找并加载对应的实现类的。
+        // 如果配置文件中的key是"ETCD"或其他大小写形式，直接传入会导致无法匹配到小写的key，
+        // 从而抛出找不到实现类的异常。
+        // 因此，这里统一将获取到的注册中心类型转换为小写，以确保SPI机制能够正确识别并加载。
+        registry = RegistryFactory.getInstance(registryConfig.getRegistry().toLowerCase());
         registry.init(registryConfig);
         log.info("registry init, config = {}", registryConfig);
         // 创建并注册 Shutdown Hook，JVM 退出时执行操作
@@ -64,6 +75,20 @@ public class RpcApplication {
             }
         }
         return rpcConfig;
+    }
+
+    /**
+     * 销毁方法，用于在测试环境中重置应用状态。
+     * 这个方法会销毁当前持有的注册中心实例（从而停止心跳等后台任务），
+     * 并将静态的配置和注册中心实例字段重置为null，
+     * 以确保每个单元测试都在一个干净的环境中独立运行。
+     */
+    public static void destroy() {
+        if (registry != null) {
+            registry.destroy();
+        }
+        registry = null;
+        rpcConfig = null;
     }
 
     /**
