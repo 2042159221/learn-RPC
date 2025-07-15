@@ -6,8 +6,11 @@ import com.ming.rpc.loadbalancer.LoadBalancerKeys;
 import com.ming.rpc.serializer.SerializerKeys;
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * RPC 框架全局配置
+ * RPC 框架配置
  */
 @Data
 public class RpcConfig {
@@ -56,6 +59,11 @@ public class RpcConfig {
      * 模拟调用
      */
     private boolean mock = false;
+
+    /**
+     * Mock服务注册表
+     */
+    private final Map<String, Class<?>> mockServiceRegistry = new HashMap<>();
 
     /**
      * 注册中心配置

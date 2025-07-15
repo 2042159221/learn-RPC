@@ -39,5 +39,17 @@ public class RpcResponse implements Serializable{
      * 异常信息
      */
     private Exception exception;
+    
+    /**
+     * 消息类型
+     */
+    private MessageType messageType;
 
+    /**
+     * 消息类型枚举
+     */
+    public enum MessageType {
+        SUCCESS,
+        FAILURE
+    }
 }
