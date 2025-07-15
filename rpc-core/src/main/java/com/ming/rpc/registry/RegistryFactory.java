@@ -1,6 +1,5 @@
 package com.ming.rpc.registry;
 
-import com.ming.rpc.registry.Registry;
 
 import com.ming.rpc.spi.SpiLoader;
 
