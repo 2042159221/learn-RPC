@@ -2,8 +2,9 @@ package com.ming.rpc.fault.retry;
 
 /**
  * 重试策略键名常量
- */ 
+ */
 public interface RetryStrategyKeys {
+
     /**
      * 不重试
      */
@@ -13,14 +14,4 @@ public interface RetryStrategyKeys {
      * 固定时间间隔
      */
     String FIXED_INTERVAL = "fixedInterval";
-
-    /**
-     * 指数退避,待实现
-     */
-    String EXPONENTIAL_BACKOFF = "exponentialBackoff";
-
-    /**
-     * 随机退避,待实现
-     */
-    String RANDOM_BACKOFF = "randomBackoff";
 }
