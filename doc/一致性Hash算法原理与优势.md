@@ -172,6 +172,25 @@ sequenceDiagram
 - 在服务节点频繁变动的环境中表现更佳
 - 适用于异构系统，各节点性能不一的情况
 
+### 5. 哈希算法的选择：从hashCode到MurmurHash
+
+值得注意的是，一致性哈希算法的最终效果在很大程度上取决于所使用的哈希算法本身。一个好的哈希算法应该具备以下特点：
+
+- **高效率**：计算速度快，不能成为性能瓶颈。
+- **低碰撞**：能将输入值尽可能均匀地映射到哈希空间中，减少冲突。
+- **雪崩效应**：输入的微小变化能引起输出的巨大变化。
+
+虽然Java对象自带的`hashCode()`方法很方便，但它的设计初衷是为了哈希表，并不能保证在一致性哈希环上实现理想的均匀分布。如果`hashCode()`实现不佳，很容易导致**数据倾斜**，即大量请求集中到少数几个节点上，违背了负载均衡的初衷。
+
+为了解决这个问题，通常会采用性能和分布性都更优秀的非加密哈希算法，**MurmurHash**就是其中的佼佼者。
+
+**MurmurHash的优势**：
+- **极高的性能**：比MD5等加密哈希算法快几个数量级。
+- **优秀的分布性**：能够产生非常均匀的哈希值，大大减少了数据倾斜的风险。
+- **实现简单**：核心算法代码量少，易于集成。
+
+因此，在生产级别的RPC框架中，推荐使用MurmurHash等专业哈希算法来代替`Object.hashCode()`，以确保负载均衡的稳定性和公平性。
+
 ## 在RPC框架中应用一致性哈希算法
 
 在RPC框架中，一致性哈希算法可以作为负载均衡策略的一部分，特别适用于以下场景：
@@ -199,7 +218,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         buildConsistentHashCircle(instances);
         
         // 计算请求的哈希值
-        int hash = hash(request.getServiceName() + request.getMethodName() 
+        int hash = getHash(request.getServiceName() + request.getMethodName()
                         + Arrays.toString(request.getArgs()));
         
         // 沿环顺时针查找第一个节点
@@ -216,28 +235,72 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         circle.clear();
         for (ServiceInstance instance : instances) {
             for (int i = 0; i < virtualNodes; i++) {
-                int hash = hash(instance.toString() + "#" + i);
+                int hash = getHash(instance.toString() + "#" + i);
                 circle.put(hash, instance);
             }
         }
     }
-    
-    private int hash(String key) {
-        // FNV1_32_HASH算法
-        final int p = 16777619;
-        int hash = (int) 2166136261L;
-        for (int i = 0; i < key.length(); i++)
-            hash = (hash ^ key.charAt(i)) * p;
-        hash += hash << 13;
-        hash ^= hash >> 7;
-        hash += hash << 3;
-        hash ^= hash >> 17;
-        hash += hash << 5;
-        return hash < 0 ? Math.abs(hash) : hash;
+
+    /**
+     * 计算给定数据的 MurmurHash3 32-bit 哈希值。
+     *
+     * @param data   要计算哈希的字节数组
+     * @param length 要处理的字节长度
+     * @param seed   哈希计算的种子值
+     * @return 32-bit 哈希值
+     */
+    private int getHash(Object key) {
+        return MurmurHashUtil.hash32(key.toString().getBytes());
     }
+    
+    // MurmurHashUtil.java 的核心实现可以放在一个独立的工具类中
+    /*
+    public static int hash32(byte[] data, int length, int seed) {
+        final int m = 0x5bd1e995;
+        final int r = 24;
+        int h = seed ^ length;
+        int len_4 = length >> 2;
+
+        for (int i = 0; i < len_4; i++) {
+            int i_4 = i << 2;
+            int k = data[i_4 + 3];
+            k = k << 8;
+            k = k | (data[i_4 + 2] & 0xff);
+            k = k << 8;
+            k = k | (data[i_4 + 1] & 0xff);
+            k = k << 8;
+            k = k | (data[i_4 + 0] & 0xff);
+            k *= m;
+            k ^= k >>> r;
+            k *= m;
+            h *= m;
+            h ^= k;
+        }
+
+        int len_m = len_4 << 2;
+        int left = length - len_m;
+        if (left != 0) {
+            if (left >= 3) {
+                h ^= (int) data[length - 3] << 16;
+            }
+            if (left >= 2) {
+                h ^= (int) data[length - 2] << 8;
+            }
+            if (left >= 1) {
+                h ^= (int) data[length - 1];
+            }
+            h *= m;
+        }
+
+        h ^= h >>> 13;
+        h *= m;
+        h ^= h >>> 15;
+        return h;
+    }
+    */
 }
 ```
 
 ## 总结
 
-一致性哈希算法通过其独特的设计，解决了分布式系统中节点变动导致的大规模数据重分布问题，在保持系统稳定性和高性能方面具有显著优势。相比传统的轮询算法，它特别适合需要保持会话一致性、高缓存命中率的场景，是分布式RPC框架中不可或缺的负载均衡算法之一。 
+一致性哈希算法通过其独特的设计，解决了分布式系统中节点变动导致的大规模数据重分布问题，在保持系统稳定性和高性能方面具有显著优势。相比传统的轮询算法，它特别适合需要保持会话一致性、高缓存命中率的场景。**而选择一个如MurmurHash一样优秀的哈希算法，是发挥一致性哈希全部威力的关键**，使其成为分布式RPC框架中不可或缺的负载均衡算法之一。 

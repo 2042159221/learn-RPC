@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.ming.rpc.model.ServiceMetaInfo;
+import com.ming.rpc.utils.MurmurHashUtil;
 
 /**
  * 一致性哈希负载均衡器
@@ -59,12 +60,15 @@ public class ConsistenHashLoadBalancer implements LoadBalancer {
     }
 
     /**
-     * Hash 算法    
+     * Hash 算法，改用 MurmurHash 以获得更好的分布性
+     * 之前使用 key.hashCode() 的方法，其分布性不佳，容易导致数据倾斜，
+     * 某些节点负载过高。MurmurHash 是一种高性能、低碰撞的哈希算法，
+     * 能更均匀地将 key 映射到哈希环上，从而实现更均衡的负载分配。
      * @param key 
      * @return 
      */
     private int getHash(Object key){
-        return key.hashCode();
+        return MurmurHashUtil.hash32(key.toString().getBytes());
     }
 
     
