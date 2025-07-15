@@ -15,12 +15,12 @@ public interface RetryStrategyKeys {
     String FIXED_INTERVAL = "fixedInterval";
 
     /**
-     * 指数退避
+     * 指数退避,待实现
      */
     String EXPONENTIAL_BACKOFF = "exponentialBackoff";
 
     /**
-     * 随机退避
+     * 随机退避,待实现
      */
     String RANDOM_BACKOFF = "randomBackoff";
 }

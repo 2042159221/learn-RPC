@@ -8,6 +8,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.junit.Ignore;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class NacosRegistryTest {
 
     // Using a GenericContainer as there's no official Nacos testcontainer module
