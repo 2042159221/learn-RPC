@@ -241,6 +241,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Vertx-Unit for testing -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-junit5</artifactId>
+            <version>${vertx.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     
     <build>

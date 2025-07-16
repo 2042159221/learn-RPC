@@ -1,2 +1,3 @@
 etcd=com.ming.rpc.registry.EtcdRegistry
 zookeeper=com.ming.rpc.registry.ZooKeeperRgistry
+mock=com.ming.rpc.registry.MockRegistry
