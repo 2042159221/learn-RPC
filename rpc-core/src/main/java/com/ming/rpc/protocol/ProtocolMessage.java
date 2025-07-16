@@ -1,10 +1,14 @@
 package com.ming.rpc.protocol;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 /**
  * 协议消息结构
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProtocolMessage<T> {
 
     /**

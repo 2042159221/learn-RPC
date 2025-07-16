@@ -1,12 +1,10 @@
 package com.ming.rpc.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ServiceRegisterInfo<T> {
@@ -19,5 +17,5 @@ public class ServiceRegisterInfo<T> {
     /**
      * 实现类
      */
-    private Class<T> serviceClass;
+    private Class<? extends T> implClass;
 }
