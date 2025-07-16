@@ -43,7 +43,6 @@ public class FailBackTolerantStrategy implements TolerantStrategy {
                 // 封装成功响应
                 RpcResponse response = new RpcResponse();
                 response.setData(result);
-                response.setMessageType(RpcResponse.MessageType.SUCCESS);
                 response.setMessage("Fallback success");
                 return response;
             } catch (Exception reflectionException) {
