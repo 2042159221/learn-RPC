@@ -1,103 +1,413 @@
-# RPC配置管理
+# Ming RPC Framework 配置管理详解
 
-## 1. 配置在RPC框架中的重要性
+## 📖 概述
 
-配置管理是RPC框架中非常重要的一个环节，它直接影响框架的灵活性、可扩展性和易用性。通过良好的配置管理机制，可以让框架在不同的环境和场景下都能灵活适应，无需修改代码就可以调整框架的行为。
+配置管理是Ming RPC Framework的核心基础设施，它直接影响框架的灵活性、可扩展性和易用性。通过完善的配置管理机制，框架能够在不同的环境和场景下灵活适应，无需修改代码就可以调整框架的行为。
 
-在RPC框架中，配置通常涉及多个方面：
-- 服务端配置（如监听地址、端口、线程池参数等）
-- 客户端配置（如超时时间、重试策略、负载均衡策略等）
-- 协议配置（如序列化方式、压缩方式等）
-- 注册中心配置（如连接地址、认证信息等）
-- 通用配置（如日志级别、监控配置等）
+### 🎯 配置管理的价值
+1. **环境适配**: 支持开发、测试、生产等不同环境的配置
+2. **行为控制**: 通过配置调整框架的运行行为
+3. **性能调优**: 通过配置优化框架性能
+4. **功能开关**: 通过配置启用或禁用特定功能
 
-## 2. learn-RPC项目中的配置类型
+### 🔧 配置涉及的方面
+- **服务端配置**: 监听地址、端口、线程池参数等
+- **客户端配置**: 超时时间、重试策略、负载均衡策略等
+- **协议配置**: 序列化方式、网络协议等
+- **注册中心配置**: 连接地址、认证信息等
+- **通用配置**: 应用名称、版本号、日志级别等
 
-本项目作为一个学习用的简易RPC框架，目前包含了以下几类配置：
+## 🏗️ Ming RPC Framework配置体系
 
-### 2.1 配置层次结构
-
+### 配置层次结构
 ```mermaid
 graph TD
-    A[RPC配置] --> B[服务端配置]
-    A --> C[客户端配置]
-    A --> D[注册中心配置]
-    A --> E[协议配置]
-    A --> F[通用配置]
-    
-    B --> B1[服务地址]
-    B --> B2[服务端口]
-    B --> B3[线程池参数]
-    
-    C --> C1[超时时间]
-    C --> C2[重试次数]
-    C --> C3[负载均衡策略]
-    
-    D --> D1[注册中心类型]
-    D --> D2[注册中心地址]
-    
-    E --> E1[序列化方式]
-    E --> E2[压缩方式]
-    
-    F --> F1[版本号]
-    F --> F2[应用名称]
+    A[RPC配置] --> B[基础配置]
+    A --> C[服务端配置]
+    A --> D[客户端配置]
+    A --> E[注册中心配置]
+    A --> F[组件配置]
+
+    B --> B1[应用名称]
+    B --> B2[版本号]
+    B --> B3[Mock模式]
+
+    C --> C1[服务地址]
+    C --> C2[服务端口]
+    C --> C3[需要启动服务器]
+
+    D --> D1[超时时间]
+    D --> D2[重试策略]
+    D --> D3[容错策略]
+
+    E --> E1[注册中心类型]
+    E --> E2[注册中心地址]
+    E --> E3[连接超时]
+
+    F --> F1[序列化器]
+    F --> F2[负载均衡器]
+    F --> F3[重试策略]
 ```
 
-### 2.2 关键配置项说明
+## 🔧 核心配置类实现
 
-1. **服务端配置**
-   - `server.host`: 服务器监听的主机地址
-   - `server.port`: 服务器监听的端口号
-   - `server.threadPool.coreSize`: 核心线程池大小
-   - `server.threadPool.maxSize`: 最大线程池大小
-
-2. **客户端配置**
-   - `client.timeout`: 调用超时时间(毫秒)
-   - `client.retries`: 失败重试次数
-   - `client.loadBalance`: 负载均衡策略(轮询、随机、一致性哈希等)
-
-3. **注册中心配置**
-   - `registry.type`: 注册中心类型(本地、ZooKeeper、Etcd等)
-   - `registry.address`: 注册中心地址
-
-4. **协议配置**
-   - `protocol.serialization`: 序列化方式(JDK、JSON等)
-   - `protocol.compression`: 压缩方式(无压缩、GZIP等)
-
-5. **通用配置**
-   - `application.name`: 应用名称
-   - `application.version`: 应用版本
-
-## 3. 当前项目配置实现方式
-
-在当前的learn-RPC项目中，配置管理采用了以下几种方式实现：
-
-### 3.1 硬编码配置
-
-目前，项目中多处使用了硬编码的方式设置配置项，如在`ServiceProxy`中直接硬编码服务器地址：
+### 1. RPC主配置类
+**文件路径**: `rpc-core/src/main/java/com/ming/rpc/config/RpcConfig.java`
 
 ```java
-// 发送请求
-// 这里地址硬编码了，后续需要使用注册中心和服务发现机制解决
-String url = "http://localhost:8081";
+@Data
+public class RpcConfig {
+    /**
+     * 名称
+     */
+    private String name = "ming-rpc";
+
+    /**
+     * 版本号
+     */
+    private String version = "1.0";
+
+    /**
+     * 服务器主机名
+     */
+    private String serverHost = "localhost";
+
+    /**
+     * 服务器端口号
+     */
+    private Integer serverPort = 8080;
+
+    /**
+     * 模拟调用
+     */
+    private boolean mock = false;
+
+    /**
+     * 序列化器
+     */
+    private String serializer = SerializerKeys.JDK;
+
+    /**
+     * 注册中心配置
+     */
+    private RegistryConfig registryConfig = new RegistryConfig();
+
+    /**
+     * 负载均衡器
+     */
+    private String loadBalancer = LoadBalancerKeys.ROUND_ROBIN;
+
+    /**
+     * 重试策略
+     */
+    private String retryStrategy = RetryStrategyKeys.NO;
+
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
+}
 ```
 
-同样，在`EasyProviderExample`中也硬编码了服务器端口：
+### 2. 注册中心配置类
+**文件路径**: `rpc-core/src/main/java/com/ming/rpc/config/RegistryConfig.java`
 
 ```java
-int port = 8081;
+@Data
+public class RegistryConfig {
+    /**
+     * 注册中心类别
+     */
+    private String registry = "etcd";
+
+    /**
+     * 注册中心地址
+     */
+    private String address = "http://localhost:2380";
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 密码
+     */
+    private String password;
+
+    /**
+     * 超时时间（单位：毫秒）
+     */
+    private Long timeout = 10000L;
+}
 ```
 
-硬编码的优点是简单直接，适合初期开发和示例代码；但缺点是不灵活，每次修改配置都需要重新编译代码。
-
-### 3.2 注解配置
-
-项目中定义了一些注解用于配置，如`@RpcService`和`@RpcReference`注解：
+### 3. Spring Boot配置属性类
+**文件路径**: `ming-rpc-spring-boot-starter/src/main/java/com/ming/rpc/springboot/starter/config/RpcConfigurationProperties.java`
 
 ```java
-/**
- * 标记RPC服务提供者
- */
+@ConfigurationProperties(prefix = "rpc")
+@Data
+public class RpcConfigurationProperties {
+    /**
+     * 名称
+     */
+    private String name = "ming-rpc";
+
+    /**
+     * 版本号
+     */
+    private String version = "1.0";
+
+    /**
+     * 服务器主机名
+     */
+    private String serverHost = "localhost";
+
+    /**
+     * 服务器端口号
+     */
+    private Integer serverPort = 8080;
+
+    /**
+     * 是否需要启动服务器
+     */
+    private Boolean needServer = true;
+
+    /**
+     * 模拟调用
+     */
+    private Boolean mock = false;
+
+    /**
+     * 序列化器
+     */
+    private String serializer = "JDK";
+
+    /**
+     * 负载均衡器
+     */
+    private String loadBalancer = "ROUND_ROBIN";
+
+    /**
+     * 重试策略
+     */
+    private String retryStrategy = "NO";
+
+    /**
+     * 容错策略
+     */
+    private String tolerantStrategy = "FAIL_FAST";
+
+    /**
+     * 注册中心配置
+     */
+    @NestedConfigurationProperty
+    private RegistryConfigProperties registryConfig = new RegistryConfigProperties();
+}
+```
+## 📁 配置加载机制
+
+### 1. 配置工具类
+**文件路径**: `rpc-core/src/main/java/com/ming/rpc/utils/ConfigUtils.java`
+
+```java
+public class ConfigUtils {
+    /**
+     * 加载配置对象
+     * @param tClass 配置类
+     * @param prefix 配置前缀
+     * @return 配置对象
+     */
+    public static <T> T loadConfig(Class<T> tClass, String prefix) {
+        return loadConfig(tClass, prefix, "");
+    }
+
+    /**
+     * 加载配置对象，支持区分环境
+     * @param tClass 配置类
+     * @param prefix 配置前缀
+     * @param environment 环境
+     * @return 配置对象
+     */
+    public static <T> T loadConfig(Class<T> tClass, String prefix, String environment) {
+        StringBuilder configFileBuilder = new StringBuilder("application");
+        if (StrUtil.isNotBlank(environment)) {
+            configFileBuilder.append("-").append(environment);
+        }
+        configFileBuilder.append(".properties");
+
+        Props props = new Props(configFileBuilder.toString());
+        return props.toBean(tClass, prefix);
+    }
+}
+```
+
+### 2. 配置加载顺序
+框架按照以下优先级加载配置：
+
+1. **命令行参数** (最高优先级)
+2. **系统环境变量**
+3. **application-{profile}.properties/yml文件**
+4. **application.properties/yml文件**
+5. **默认配置** (最低优先级)
+
+### 3. 配置文件支持格式
+
+#### Properties文件
+```properties
+# application.properties
+rpc.name=ming-rpc-app
+rpc.version=1.0
+rpc.serverHost=localhost
+rpc.serverPort=8080
+rpc.mock=false
+rpc.serializer=JDK
+rpc.loadBalancer=ROUND_ROBIN
+rpc.retryStrategy=NO
+rpc.tolerantStrategy=FAIL_FAST
+
+# 注册中心配置
+rpc.registryConfig.registry=etcd
+rpc.registryConfig.address=http://localhost:2379
+rpc.registryConfig.timeout=10000
+```
+
+#### YAML文件
+```yaml
+# application.yml
+rpc:
+  name: ming-rpc-app
+  version: 1.0
+  serverHost: localhost
+  serverPort: 8080
+  mock: false
+  serializer: JDK
+  loadBalancer: ROUND_ROBIN
+  retryStrategy: NO
+  tolerantStrategy: FAIL_FAST
+
+  registryConfig:
+    registry: etcd
+    address: http://localhost:2379
+    timeout: 10000
+```
+
+#### 环境特定配置
+```yaml
+# application-dev.yml (开发环境)
+rpc:
+  serverHost: localhost
+  mock: true
+  registryConfig:
+    registry: MOCK
+
+# application-prod.yml (生产环境)
+rpc:
+  serverHost: 0.0.0.0
+  mock: false
+  registryConfig:
+    registry: etcd
+    address: http://etcd-cluster:2379
+```
+
+## 🌟 Spring Boot集成配置
+
+### 1. 自动配置类
+**文件路径**: `ming-rpc-spring-boot-starter/src/main/java/com/ming/rpc/springboot/starter/config/RpcAutoConfiguration.java`
+
+```java
+@Configuration
+@EnableConfigurationProperties(RpcConfigurationProperties.class)
+@ConditionalOnProperty(prefix = "rpc", name = "enabled", havingValue = "true", matchIfMissing = true)
+public class RpcAutoConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RpcConfig rpcConfig(RpcConfigurationProperties properties) {
+        RpcConfig rpcConfig = new RpcConfig();
+
+        // 复制属性
+        BeanUtil.copyProperties(properties, rpcConfig);
+
+        // 处理注册中心配置
+        if (properties.getRegistryConfig() != null) {
+            RegistryConfig registryConfig = new RegistryConfig();
+            BeanUtil.copyProperties(properties.getRegistryConfig(), registryConfig);
+            rpcConfig.setRegistryConfig(registryConfig);
+        }
+
+        return rpcConfig;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RpcInitBootstrap rpcInitBootstrap(RpcConfig rpcConfig) {
+        return new RpcInitBootstrap(rpcConfig);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RpcProviderBootstrap rpcProviderBootstrap(RpcConfig rpcConfig) {
+        return new RpcProviderBootstrap(rpcConfig);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RpcConsumerBootstrap rpcConsumerBootstrap(RpcConfig rpcConfig) {
+        return new RpcConsumerBootstrap(rpcConfig);
+    }
+}
+```
+
+### 2. Spring Boot配置示例
+```yaml
+# application.yml
+rpc:
+  name: user-service
+  version: 1.0
+  serverHost: 0.0.0.0
+  serverPort: 8080
+  needServer: true
+  mock: false
+  serializer: JSON
+  loadBalancer: ROUND_ROBIN
+  retryStrategy: FIXED_INTERVAL
+  tolerantStrategy: FAIL_OVER
+
+  registryConfig:
+    registry: etcd
+    address: http://localhost:2379
+    timeout: 10000
+
+# 多环境配置
+spring:
+  profiles:
+    active: dev
+
+---
+spring:
+  profiles: dev
+rpc:
+  mock: true
+  registryConfig:
+    registry: MOCK
+
+---
+spring:
+  profiles: prod
+rpc:
+  serverHost: 0.0.0.0
+  registryConfig:
+    registry: etcd
+    address: http://etcd-cluster:2379
+```
+
+### 3. 注解配置
+项目中定义了注解用于服务配置：
+
+#### @RpcService注解
+```java
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -106,48 +416,61 @@ public @interface RpcService {
      * 服务接口类
      */
     Class<?> interfaceClass() default void.class;
-    
+
     /**
      * 服务版本
      */
-    String version() default "";
-    
+    String version() default RpcConstant.DEFAULT_SERVICE_VERSION;
+
     /**
      * 服务分组
      */
-    String group() default "";
+    String group() default RpcConstant.DEFAULT_SERVICE_GROUP;
 }
+```
 
-/**
- * 标记RPC服务消费者
- */
+#### @RpcReference注解
+```java
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RpcReference {
     /**
+     * 服务接口类
+     */
+    Class<?> interfaceClass() default void.class;
+
+    /**
      * 服务版本
      */
-    String version() default "";
-    
+    String version() default RpcConstant.DEFAULT_SERVICE_VERSION;
+
     /**
      * 服务分组
      */
-    String group() default "";
-    
+    String group() default RpcConstant.DEFAULT_SERVICE_GROUP;
+
     /**
-     * 超时时间，单位毫秒
+     * 负载均衡器
      */
-    long timeout() default 3000;
-    
+    String loadBalancer() default LoadBalancerKeys.ROUND_ROBIN;
+
     /**
-     * 重试次数
+     * 重试策略
      */
-    int retries() default 2;
+    String retryStrategy() default RetryStrategyKeys.NO;
+
+    /**
+     * 容错策略
+     */
+    String tolerantStrategy() default TolerantStrategyKeys.FAIL_FAST;
+
+    /**
+     * 模拟调用
+     */
+    boolean mock() default false;
 }
 ```
-
-注解配置的优点是与代码紧密集成，使用方便；缺点是配置与代码耦合，修改配置可能需要重新编译。
 
 ### 3.3 包级别配置说明
 
@@ -262,6 +585,186 @@ public interface RpcConfig {
     // 获取序列化方式，默认JDK
     @ConfigProperty(key = "protocol.serialization", defaultValue = "JDK")
     String getSerialization();
+}
+```
+
+## 📚 配置使用指南
+
+### 1. 基础配置示例
+
+#### 服务提供者配置
+```yaml
+# Provider application.yml
+rpc:
+  name: user-service-provider
+  version: 1.0
+  serverHost: 0.0.0.0
+  serverPort: 8080
+  needServer: true
+  serializer: JSON
+
+  registryConfig:
+    registry: etcd
+    address: http://localhost:2379
+```
+
+#### 服务消费者配置
+```yaml
+# Consumer application.yml
+rpc:
+  name: user-service-consumer
+  version: 1.0
+  needServer: false
+  loadBalancer: ROUND_ROBIN
+  retryStrategy: FIXED_INTERVAL
+  tolerantStrategy: FAIL_OVER
+
+  registryConfig:
+    registry: etcd
+    address: http://localhost:2379
+```
+
+### 2. 配置项详解
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `rpc.name` | String | ming-rpc | RPC应用名称 |
+| `rpc.version` | String | 1.0 | RPC应用版本 |
+| `rpc.serverHost` | String | localhost | RPC服务器主机 |
+| `rpc.serverPort` | Integer | 8080 | RPC服务器端口 |
+| `rpc.needServer` | Boolean | true | 是否需要启动RPC服务器 |
+| `rpc.mock` | Boolean | false | 是否启用Mock模式 |
+| `rpc.serializer` | String | JDK | 序列化器类型 |
+| `rpc.loadBalancer` | String | ROUND_ROBIN | 负载均衡策略 |
+| `rpc.retryStrategy` | String | NO | 重试策略 |
+| `rpc.tolerantStrategy` | String | FAIL_FAST | 容错策略 |
+
+### 3. 注册中心配置
+
+| 配置项 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| `rpc.registryConfig.registry` | String | etcd | 注册中心类型 |
+| `rpc.registryConfig.address` | String | http://localhost:2379 | 注册中心地址 |
+| `rpc.registryConfig.username` | String | - | 用户名 |
+| `rpc.registryConfig.password` | String | - | 密码 |
+| `rpc.registryConfig.timeout` | Long | 10000 | 连接超时时间(毫秒) |
+
+### 4. 组件配置选项
+
+#### 序列化器选项
+- `JDK`: Java原生序列化
+- `JSON`: JSON序列化
+- `HESSIAN`: Hessian序列化
+- `KRYO`: Kryo序列化
+
+#### 负载均衡策略
+- `ROUND_ROBIN`: 轮询
+- `RANDOM`: 随机
+- `CONSISTENT_HASH`: 一致性哈希
+
+#### 重试策略
+- `NO`: 不重试
+- `FIXED_INTERVAL`: 固定间隔重试
+
+#### 容错策略
+- `FAIL_FAST`: 快速失败
+- `FAIL_SAFE`: 静默处理
+- `FAIL_BACK`: 故障转移
+
+#### 注册中心类型
+- `ETCD`: Etcd注册中心
+- `ZOOKEEPER`: ZooKeeper注册中心
+- `CONSUL`: Consul注册中心
+- `NACOS`: Nacos注册中心
+- `MOCK`: Mock注册中心(测试用)
+
+## 🎯 最佳实践
+
+### 1. 环境配置管理
+```yaml
+# 基础配置 application.yml
+rpc:
+  name: ${spring.application.name}
+  version: 1.0
+
+# 开发环境 application-dev.yml
+rpc:
+  mock: true
+  registryConfig:
+    registry: MOCK
+
+# 测试环境 application-test.yml
+rpc:
+  registryConfig:
+    registry: etcd
+    address: http://test-etcd:2379
+
+# 生产环境 application-prod.yml
+rpc:
+  serverHost: 0.0.0.0
+  registryConfig:
+    registry: etcd
+    address: http://prod-etcd-cluster:2379
+```
+
+### 2. 配置外部化
+```bash
+# 通过环境变量覆盖配置
+export RPC_REGISTRY_CONFIG_ADDRESS=http://external-etcd:2379
+export RPC_SERVER_HOST=0.0.0.0
+
+# 通过命令行参数覆盖配置
+java -jar app.jar --rpc.registryConfig.address=http://external-etcd:2379
+```
+
+### 3. 配置验证
+```java
+@Component
+@Validated
+public class RpcConfigValidator {
+
+    @EventListener
+    public void validateConfig(ApplicationReadyEvent event) {
+        RpcConfig config = applicationContext.getBean(RpcConfig.class);
+
+        // 验证端口范围
+        if (config.getServerPort() < 1024 || config.getServerPort() > 65535) {
+            throw new IllegalArgumentException("Invalid server port: " + config.getServerPort());
+        }
+
+        // 验证注册中心地址
+        if (StrUtil.isBlank(config.getRegistryConfig().getAddress())) {
+            throw new IllegalArgumentException("Registry address cannot be empty");
+        }
+    }
+}
+```
+
+## 📋 总结
+
+Ming RPC Framework的配置管理系统提供了完整的配置解决方案：
+
+### 核心特性
+- ✅ **多格式支持**: Properties、YAML等配置文件格式
+- ✅ **环境隔离**: 支持多环境配置管理
+- ✅ **Spring Boot集成**: 无缝集成Spring Boot配置体系
+- ✅ **注解驱动**: 通过注解简化配置
+- ✅ **类型安全**: 强类型配置属性绑定
+
+### 技术优势
+- **灵活性**: 支持多种配置来源和格式
+- **可维护性**: 清晰的配置结构和文档
+- **扩展性**: 易于添加新的配置项和组件
+- **安全性**: 支持配置验证和类型检查
+
+### 使用建议
+1. **开发环境**: 使用Mock模式快速开发
+2. **测试环境**: 使用真实注册中心验证功能
+3. **生产环境**: 使用集群化注册中心保证高可用
+4. **配置管理**: 通过配置中心统一管理配置
+5. **监控告警**: 监控配置变更和异常情况
+
+通过完善的配置管理机制，Ming RPC Framework能够适应各种部署环境和使用场景，为分布式应用提供灵活可靠的RPC通信能力。
 }
 
 // 配置使用
