@@ -34,18 +34,32 @@ public class UserController {
      * @return 用户信息
      */
     @GetMapping("/{name}")
-    public User getUser(@PathVariable String name) {
+    public User getUser(@PathVariable("name") String name) {
         log.info("Consumer received request for user: {}", name);
-        
+
         // 创建用户对象
         User user = new User();
         user.setName(name);
-        
-        // 调用远程服务
-        User result = userService.getUser(user);
-        
-        log.info("Consumer received response: {}", result);
-        return result;
+
+        // 检查RPC服务是否可用
+        if (userService == null) {
+            log.warn("RPC service is not available, returning mock response");
+            User mockResult = new User();
+            mockResult.setName("Mock response (RPC service unavailable): " + name);
+            return mockResult;
+        }
+
+        try {
+            // 调用远程服务
+            User result = userService.getUser(user);
+            log.info("Consumer received response: {}", result);
+            return result;
+        } catch (Exception e) {
+            log.error("RPC call failed: {}", e.getMessage());
+            User errorResult = new User();
+            errorResult.setName("Error response (RPC call failed): " + name);
+            return errorResult;
+        }
     }
 
     /**

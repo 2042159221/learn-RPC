@@ -19,7 +19,7 @@ rpc:
   
   # 注册中心配置
   registryConfig:
-    registry: ETCD
+    registry: MOCK
     address: http://localhost:2380
     timeout: 10000
 
