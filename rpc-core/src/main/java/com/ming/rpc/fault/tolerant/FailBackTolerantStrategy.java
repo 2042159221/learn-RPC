@@ -1,5 +1,6 @@
 package com.ming.rpc.fault.tolerant;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.ming.rpc.RpcApplication;
@@ -8,8 +9,6 @@ import com.ming.rpc.model.RpcRequest;
 import com.ming.rpc.model.RpcResponse;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.lang.reflect.Method;
 
 /** 
  * 降级到其他服务 - 容错策略
@@ -44,6 +43,7 @@ public class FailBackTolerantStrategy implements TolerantStrategy {
                 RpcResponse response = new RpcResponse();
                 response.setData(result);
                 response.setMessage("Fallback success");
+                response.setMessageType(RpcResponse.MessageType.SUCCESS);
                 return response;
             } catch (Exception reflectionException) {
                 log.error("Failed to execute mock service via reflection.", reflectionException);
