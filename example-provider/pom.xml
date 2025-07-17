@@ -49,7 +49,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>com.ming.example.provider.EasyProviderExample</mainClass>
+                    <mainClass>com.ming.example.provider.TestProviderExample</mainClass>
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
                 </configuration>
             </plugin>

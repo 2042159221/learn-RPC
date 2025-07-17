@@ -2,7 +2,7 @@ package com.ming.example.consumer.client.proxy;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 
-import com.ming.example.common.modle.User;
+import com.ming.example.common.model.User;
 import com.ming.example.common.service.UserService;
 import com.ming.rpc.serializer.JdkSerializer;
 import com.ming.rpc.serializer.Serializer;

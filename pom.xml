@@ -15,12 +15,18 @@
         <module>example-common</module>
         <module>example-provider</module>
         <module>example-consumer</module>
+        <module>ming-rpc-spring-boot-starter</module>
+        <module>example-springboot-provider</module>
+        <module>example-springboot-consumer</module>
+        <module>integration-tests</module>
     </modules>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lombok.version>1.18.38</lombok.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
     </properties>
 
 </project> 

@@ -1,4 +1,4 @@
-package com.ming.example.common.modle;
+package com.ming.example.common.model;
 
 import java.io.Serializable;
 

@@ -1,26 +1,33 @@
 package com.ming.example.consumer;
 
-import com.ming.rpc.bootstrap.ConsumerBootstrap;
-
-import java.util.function.Consumer;
-
+import com.ming.example.common.model.User;                              
 import com.ming.example.common.service.UserService;
+import com.ming.rpc.bootstrap.ConsumerBootstrap;
+import com.ming.rpc.proxy.ServiceProxyFactory;
 
 /**
  * 服务消费者示例
- * 
+ *
+ * @author <a href="https://github.com/liyupi">程序员鱼皮</a>
+ * @learn <a href="https://codefather.cn">编程宝典</a>
+ * @from <a href="https://yupi.icu">编程导航知识星球</a>
  */
 public class ConsumerExample {
-    public static void main(String[] args) {
-        // 创建一个消费者
-        // RpcConsumer consumer = new RpcConsumer();
-        ConsumerBootstrap.init();
-        // // 设置服务提供者的地址
-        // consumer.setProviderAddress("127.0.0.1:8080");
-        // // 设置服务提供者的接口
-        // consumer.setServiceInterface(UserService.class);
 
-        //获取代理
-        
+    public static void main(String[] args) {
+        // 服务提供者初始化
+        ConsumerBootstrap.init();
+
+        // 获取代理
+        UserService userService = ServiceProxyFactory.getProxy(UserService.class);
+        User user = new User();
+        user.setName("yupi");
+        // 调用
+        User newUser = userService.getUser(user);
+        if (newUser != null) {
+            System.out.println(newUser.getName());
+        } else {
+            System.out.println("user == null");
+        }
     }
 }

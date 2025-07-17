@@ -1,6 +1,6 @@
 package com.ming.example.provider.service.impl;
 
-import com.ming.example.common.modle.User;
+import com.ming.example.common.model.User;
 import com.ming.example.common.service.UserService;
 
 /**
@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
      * @return 用户
      */
     @Override
-    public User getUser(User user) {
+    public User getUser(User user) {        
         
         
         // 打印用户名称

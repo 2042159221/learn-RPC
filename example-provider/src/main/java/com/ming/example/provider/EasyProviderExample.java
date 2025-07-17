@@ -3,8 +3,8 @@ package com.ming.example.provider;
 import com.ming.example.common.service.UserService;
 import com.ming.example.provider.service.impl.UserServiceImpl;
 import com.ming.rpc.registry.LocalRegistry;
-import com.ming.rpc.server.HttpServer;
-import com.ming.rpc.server.VertexHttpServer;
+import com.ming.rpc.server.http.HttpServer;
+import com.ming.rpc.server.http.VertxHttpServer;
 
 /**
  * 服务提供者启动类
@@ -39,7 +39,7 @@ public class EasyProviderExample {
             // 这里可以添加RPC服务暴露的代码
             // 暂时仅创建基础结构，后续会实现RPC服务发布功能
             System.out.println("正在创建HTTP服务器...");
-            HttpServer httpServer = new VertexHttpServer();
+            HttpServer httpServer = new VertxHttpServer();
             // 修改端口号为8081，避免端口冲突
             int port = 8081;
             System.out.println("正在启动HTTP服务器，监听端口: " + port + "...");

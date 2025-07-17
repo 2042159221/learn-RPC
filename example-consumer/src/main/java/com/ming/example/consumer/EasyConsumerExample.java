@@ -1,8 +1,8 @@
 package com.ming.example.consumer;
 
-import com.ming.example.common.modle.User;
+import com.ming.example.common.model.User;
 import com.ming.example.common.service.UserService;
-import com.ming.rpc.client.proxy.ServiceProxyFactory;
+import com.ming.rpc.proxy.ServiceProxyFactory;
 
 /**
  * 服务消费者示例

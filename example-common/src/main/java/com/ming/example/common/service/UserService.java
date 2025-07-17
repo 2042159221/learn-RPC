@@ -1,6 +1,6 @@
 package com.ming.example.common.service;
 
-import com.ming.example.common.modle.User;
+import com.ming.example.common.model.User;
 
 
 /**

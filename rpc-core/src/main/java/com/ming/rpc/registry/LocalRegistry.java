@@ -1,6 +1,7 @@
 package com.ming.rpc.registry;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -17,7 +18,7 @@ public class LocalRegistry {
      * 注册服务
      * @param serviceName
      * @param implClass
-     * 
+     *
      */
     public  static void register(String serviceName,Class<?> implClass){
         map.put(serviceName, implClass);
@@ -38,5 +39,13 @@ public class LocalRegistry {
      */
     public static void remove(String serviceName){
         map.remove(serviceName);
+    }
+
+    /**
+     * 列出所有已注册的服务
+     * @return 服务名称集合
+     */
+    public static Set<String> listServices() {
+        return map.keySet();
     }
 }
